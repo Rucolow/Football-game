@@ -1,0 +1,233 @@
+/* ========================================
+   モバイル専用スタイル
+======================================== */
+
+/* タッチ最適化 */
+@media (max-width: 768px) {
+  /* 最小タップサイズ44px確保 */
+  .menu-btn,
+  .method-btn,
+  .action-btn,
+  .nav-btn,
+  .back-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* タッチフィードバック */
+  .menu-btn:active,
+  .method-btn:active,
+  .action-btn:active,
+  .nav-btn:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+  
+  /* フォント調整 */
+  html {
+    font-size: 14px;
+  }
+  
+  /* セーフエリア対応 */
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .screen-header {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  #bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* 極小画面対応 */
+@media (max-width: 375px) {
+  .menu-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .loading-logo {
+    font-size: 3rem;
+  }
+  
+  .status-card {
+    padding: 1rem;
+  }
+  
+  .method-card {
+    padding: 1rem;
+  }
+  
+  .form-group input {
+    padding: 0.6rem;
+  }
+}
+
+/* 横画面対応 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .loading-content {
+    padding: 1rem;
+  }
+  
+  .loading-logo {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .loading-content h1 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .menu-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .menu-header h1 {
+    font-size: 2rem;
+  }
+}
+
+/* iOS Safari専用調整 */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safariでのビューポート調整 */
+  .screen {
+    min-height: -webkit-fill-available;
+  }
+  
+  /* iOSでのスクロールバウンス無効化 */
+  body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* iOSでの入力フィールド拡大防止 */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Android Chrome専用調整 */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  /* Android Chromeでのフォント調整 */
+  .nav-label {
+    font-size: 0.65rem;
+  }
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1f1a;
+    --text: #e8ede8;
+    --light-gray: #2d332d;
+    --white: #242a24;
+    --dark-gray: #a0a0a0;
+  }
+  
+  .method-card,
+  .status-card,
+  .setting-group {
+    background: var(--white);
+    border-color: var(--light-gray);
+  }
+  
+  .form-group input {
+    background: var(--white);
+    color: var(--text);
+    border-color: var(--light-gray);
+  }
+  
+  #bottom-nav {
+    background: var(--white);
+    border-top-color: var(--light-gray);
+  }
+  
+  .overlay-menu .menu-content {
+    background: var(--white);
+  }
+}
+
+/* 高コントラストモード */
+@media (prefers-contrast: high) {
+  :root {
+    --primary: #1a4a15;
+    --secondary: #2a5a2a;
+    --accent: #156b64;
+    --border-radius: 4px;
+  }
+  
+  .menu-btn,
+  .method-btn,
+  .action-btn {
+    border-width: 3px;
+  }
+}
+
+/* アニメーション削減設定 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .loading-logo {
+    animation: none;
+  }
+  
+  .loading-progress {
+    animation: none;
+    width: 100%;
+  }
+}
+
+/* スクリーンリーダー対応 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* フォーカス表示改善 */
+button:focus,
+input:focus,
+select:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ハイドPI対応 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* 高解像度画面での調整 */
+  .status-icon,
+  .method-icon,
+  .btn-icon,
+  .nav-icon {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* 電力節約モード */
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark) {
+  .loading-content,
+  .menu-header,
+  .status-card {
+    filter: brightness(0.9);
+  }
+}

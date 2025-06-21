@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="無料のサッカーマネージャーゲーム - 12人リーグでマルチプレイ対応">
+    <meta name="keywords" content="サッカー,ゲーム,マネージャー,無料,マルチプレイ">
+    <meta name="author" content="Football Manager Game">
+    
+    <!-- PWA対応 -->
+    <meta name="theme-color" content="#2d5a27">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="サッカーマネージャー">
+    
+    <!-- アイコン -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <title>⚽ サッカーマネージャーゲーム</title>
+</head>
+<body>
+    <!-- ローディング画面 -->
+    <div id="loading-screen" class="screen active">
+        <div class="loading-content">
+            <div class="loading-logo">⚽</div>
+            <h1>サッカーマネージャー</h1>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <p>読み込み中...</p>
+        </div>
+    </div>
+
+    <!-- メインメニュー -->
+    <div id="main-menu" class="screen">
+        <div class="menu-header">
+            <h1>⚽ サッカーマネージャー</h1>
+            <p class="version">v1.0.0 - 無料版</p>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="menu-btn primary" onclick="game.showTeamSetup()">
+                <span class="btn-icon">👥</span>
+                <span class="btn-text">新しいゲーム</span>
+            </button>
+            
+            <button class="menu-btn secondary" onclick="game.loadGame()" id="continue-btn" style="display:none;">
+                <span class="btn-icon">📂</span>
+                <span class="btn-text">ゲームを続ける</span>
+            </button>
+            
+            <button class="menu-btn secondary" onclick="game.showSettings()">
+                <span class="btn-icon">⚙️</span>
+                <span class="btn-text">設定</span>
+            </button>
+            
+            <button class="menu-btn secondary" onclick="game.showAbout()">
+                <span class="btn-icon">ℹ️</span>
+                <span class="btn-text">ゲームについて</span>
+            </button>
+        </div>
+        
+        <div class="menu-footer">
+            <p>完全無料 | オープンソース</p>
+        </div>
+    </div>
+
+    <!-- チーム設定画面 -->
+    <div id="team-setup" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="game.showMainMenu()">←</button>
+            <h2>チーム作成</h2>
+        </div>
+        
+        <div class="setup-content">
+            <div class="form-group">
+                <label for="team-name">チーム名</label>
+                <input type="text" id="team-name" placeholder="あなたのチーム名" maxlength="20">
+            </div>
+            
+            <div class="form-group">
+                <label for="manager-name">監督名</label>
+                <input type="text" id="manager-name" placeholder="あなたの名前" maxlength="15">
+            </div>
+            
+            <div class="formation-methods">
+                <h3>チーム編成方法</h3>
+                
+                <div class="method-card recommended">
+                    <div class="method-header">
+                        <span class="method-icon">⚡</span>
+                        <span class="method-title">おまかせ編成</span>
+                        <span class="recommended-badge">推奨</span>
+                    </div>
+                    <p>30秒で完了！バランス良くランダム編成</p>
+                    <button class="method-btn" onclick="game.startAutoFormation('random')">
+                        おまかせで開始
+                    </button>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-header">
+                        <span class="method-icon">🎯</span>
+                        <span class="method-title">バランス編成</span>
+                    </div>
+                    <p>各ポジション均等配分の安定型</p>
+                    <button class="method-btn" onclick="game.startAutoFormation('balanced')">
+                        バランス編成
+                    </button>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-header">
+                        <span class="method-icon">🔥</span>
+                        <span class="method-title">攻撃重視編成</span>
+                    </div>
+                    <p>FW・MFに予算集中の得点重視型</p>
+                    <button class="method-btn" onclick="game.startAutoFormation('offensive')">
+                        攻撃重視編成
+                    </button>
+                </div>
+                
+                <div class="method-card advanced">
+                    <div class="method-header">
+                        <span class="method-icon">⚙️</span>
+                        <span class="method-title">手動編成</span>
+                    </div>
+                    <p>監督・選手を個別に選択（上級者向け）</p>
+                    <button class="method-btn" onclick="game.showManualFormation()">
+                        手動で編成
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲームメイン画面 -->
+    <div id="game-main" class="screen">
+        <div class="game-header">
+            <div class="team-info">
+                <h2 id="current-team-name">チーム名FC</h2>
+                <p id="current-season">シーズン1 - 第1節</p>
+            </div>
+            <div class="menu-toggle">
+                <button onclick="ui.toggleGameMenu()">☰</button>
+            </div>
+        </div>
+        
+        <div class="game-content">
+            <div class="status-cards">
+                <div class="status-card">
+                    <div class="status-icon">🏆</div>
+                    <div class="status-info">
+                        <span class="status-label">現在順位</span>
+                        <span class="status-value" id="current-rank">-位</span>
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <div class="status-icon">⚽</div>
+                    <div class="status-info">
+                        <span class="status-label">次の対戦</span>
+                        <span class="status-value" id="next-opponent">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="action-btn" onclick="ui.showTeamManagement()">
+                    <span class="btn-icon">👥</span>
+                    <span class="btn-text">チーム管理</span>
+                </button>
+                
+                <button class="action-btn" onclick="ui.showTactics()">
+                    <span class="btn-icon">⚽</span>
+                    <span class="btn-text">戦術設定</span>
+                </button>
+                
+                <button class="action-btn" onclick="ui.showLeagueTable()">
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text">順位表</span>
+                </button>
+                
+                <button class="action-btn" onclick="ui.showMatchResults()">
+                    <span class="btn-icon">🎯</span>
+                    <span class="btn-text">試合結果</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- ゲームメニュー -->
+        <div id="game-menu" class="overlay-menu">
+            <div class="menu-content">
+                <button onclick="game.saveGame()">💾 セーブ</button>
+                <button onclick="ui.showSettings()">⚙️ 設定</button>
+                <button onclick="game.confirmReturnToMenu()">🏠 メインメニュー</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定画面 -->
+    <div id="settings" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="ui.closeSettings()">←</button>
+            <h2>設定</h2>
+        </div>
+        
+        <div class="settings-content">
+            <div class="setting-group">
+                <h3>音声設定</h3>
+                <div class="setting-item">
+                    <label>効果音</label>
+                    <input type="checkbox" id="sound-enabled" checked>
+                </div>
+                <div class="setting-item">
+                    <label>音量</label>
+                    <input type="range" id="volume" min="0" max="100" value="50">
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <h3>表示設定</h3>
+                <div class="setting-item">
+                    <label>アニメーション</label>
+                    <input type="checkbox" id="animations-enabled" checked>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <h3>データ管理</h3>
+                <button class="danger-btn" onclick="game.confirmDataReset()">
+                    🗑️ ゲームデータをリセット
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- フッターナビゲーション -->
+    <nav id="bottom-nav" style="display:none;">
+        <button onclick="ui.showGameMain()" class="nav-btn active">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">ホーム</span>
+        </button>
+        <button onclick="ui.showTeamManagement()" class="nav-btn">
+            <span class="nav-icon">👥</span>
+            <span class="nav-label">チーム</span>
+        </button>
+        <button onclick="ui.showTactics()" class="nav-btn">
+            <span class="nav-icon">⚽</span>
+            <span class="nav-label">戦術</span>
+        </button>
+        <button onclick="ui.showLeagueTable()" class="nav-btn">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">順位表</span>
+        </button>
+    </nav>
+
+    <!-- JavaScript -->
+    <!-- Core utilities (依存関係なし、最初に読み込み) -->
+    <script src="js/utils.js"></script>
+    
+    <!-- Data files (Coreに依存) -->
+    <script src="js/data/coaches.js"></script>
+    <script src="js/data/players.js"></script>
+    
+    <!-- Game systems (Data filesに依存) -->
+    <script src="js/saveManager.js"></script>
+    <script src="js/matchEngine.js"></script>
+    <script src="js/growthEngine.js"></script>
+    <script src="js/teamBuilder.js"></script>
+    <script src="js/leagueManager.js"></script>
+    
+    <!-- UI and Game Engine (Game systemsに依存) -->
+    <script src="js/uiManager.js"></script>
+    <script src="js/gameEngine.js"></script>
+    
+    <!-- Main initialization (最後に実行) -->
+    <script src="js/main.js"></script>
+    
+    <!-- Integration test script -->
+    <script>
+    // 統合テスト用スクリプト
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('🎮 Football Manager Game - Integration Test');
+        console.log('===========================================');
+        
+        // 必要なオブジェクトの存在確認
+        const checks = [
+            { name: 'DEBUG', obj: typeof DEBUG !== 'undefined' ? DEBUG : null },
+            { name: 'log', obj: typeof log !== 'undefined' ? log : null },
+            { name: 'random', obj: typeof random !== 'undefined' ? random : null },
+            { name: 'storage', obj: typeof storage !== 'undefined' ? storage : null },
+            { name: 'dom', obj: typeof dom !== 'undefined' ? dom : null },
+            { name: 'notify', obj: typeof notify !== 'undefined' ? notify : null },
+            { name: 'COACHES_DATA', obj: typeof COACHES_DATA !== 'undefined' ? COACHES_DATA : null },
+            { name: 'PLAYER_TEMPLATES', obj: typeof PLAYER_TEMPLATES !== 'undefined' ? PLAYER_TEMPLATES : null },
+            { name: 'saveManager', obj: typeof saveManager !== 'undefined' ? saveManager : null },
+            { name: 'matchEngine', obj: typeof matchEngine !== 'undefined' ? matchEngine : null },
+            { name: 'growthEngine', obj: typeof growthEngine !== 'undefined' ? growthEngine : null },
+            { name: 'teamBuilder', obj: typeof teamBuilder !== 'undefined' ? teamBuilder : null },
+            { name: 'leagueManager', obj: typeof leagueManager !== 'undefined' ? leagueManager : null },
+            { name: 'ui', obj: typeof ui !== 'undefined' ? ui : null },
+            { name: 'game', obj: typeof game !== 'undefined' ? game : null }
+        ];
+        
+        let allPassed = true;
+        checks.forEach(check => {
+            if (check.obj !== null) {
+                console.log(`✅ ${check.name}: OK`);
+            } else {
+                console.log(`❌ ${check.name}: MISSING`);
+                allPassed = false;
+            }
+        });
+        
+        console.log('===========================================');
+        if (allPassed) {
+            console.log('🎉 All systems loaded successfully!');
+            
+            // 基本機能テスト
+            try {
+                const testTeam = teamBuilder.buildAutoTeam(1000000000, 'balanced');
+                console.log('✅ TeamBuilder test: OK', testTeam);
+                
+                const testMatch = matchEngine.simulateMatch(
+                    { name: 'Test Team 1', players: testTeam.players, tactics: testTeam.tactics, coach: testTeam.coach, stats: testTeam.stats },
+                    { name: 'Test Team 2', players: testTeam.players, tactics: testTeam.tactics, coach: testTeam.coach, stats: testTeam.stats },
+                    1
+                );
+                console.log('✅ MatchEngine test: OK', testMatch);
+                
+                console.log('🚀 Ready to play!');
+            } catch (error) {
+                console.log('❌ Function test failed:', error);
+                allPassed = false;
+            }
+        } else {
+            console.log('❌ Some systems failed to load');
+        }
+        
+        // 結果表示
+        if (allPassed) {
+            setTimeout(() => {
+                notify.success('🎮 ゲームシステム初期化完了！');
+            }, 1000);
+        } else {
+            setTimeout(() => {
+                notify.error('⚠️ 一部システムの読み込みに失敗しました');
+            }, 1000);
+        }
+    });
+    </script>
+</body>
+</html>
